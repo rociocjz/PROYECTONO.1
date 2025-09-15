@@ -54,13 +54,7 @@ class Curso:
         self._estudiantes = set()
         self.evaluaciones = {}
 
-    def agregar_estudiante(self, estudiante):
-        if estudiante in self._estudiantes:
-            print(f"El estudiante {estudiante.nombre} ya está inscrito en el curso {self.nombre}.")
-        else:
-            self._estudiantes.add(estudiante)
-            print(f"Estudiante {estudiante.nombre} agregado existosamente al curso {self.nombre}.")
-            
+
     def agregar_estudiante(self, carnet_estudiante):
        while True:
             if carnet_estudiante in self._estudiantes:
