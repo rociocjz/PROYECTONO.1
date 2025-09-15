@@ -159,3 +159,79 @@ class Sistema:
                     promedio = sum(notas) / len(notas)
                     if promedio < 60:
                         print(f"Estudiante {estudiante} tiene un promedio de {promedio:.2f} - REPROBADO TIENE RENDIMIENTO MUY BAJO")
+
+def menu():
+    sistema = Sistema()
+    while True:
+        print("\n--- Menú del Sistema de Gestión Académica ---")
+        print("1. Agregar Estudiante")
+        print("2. Agregar Catedrático")
+        print("3. Agregar Curso")
+        print("4. Inscribir Estudiante en Curso")
+        print("5. Agregar Evaluación a Curso")
+        print("6. Registrar Calificación")
+        print("7. Generar Reporte de Curso")
+        print("8. Salir")
+
+        opcion = input("Seleccione una opción: ")
+
+        try:
+            if opcion == "1":
+                carnet = input("Ingrese el carnet del estudiante: ")
+                nombre = input("Ingrese el nombre del estudiante: ")
+                estudiante = Estudiante(carnet, nombre)
+                sistema.agregar_usuario(estudiante)
+                print(f"Estudiante {nombre} agregado exitosamente.")
+
+
+            elif opcion == "2":
+                carnet = input("Ingrese el carnet del catedrático: ")
+                nombre = input("Ingrese el nombre del catedrático: ")
+                catedratico = Catedratico(carnet, nombre)
+                sistema.agregar_usuario(catedratico)
+                print(f"Catedrático {nombre} agregado exitosamente.")   
+
+            elif opcion == "3":
+                nombre_curso = input("Ingrese el nombre del curso: ")
+                nombre = input("Ingrese el nombre del catedrático asignado: ")
+                carnet_catedratico = input("Ingrese el carnet del catedrático asignado: ")
+                sistema.agregar_curso(nombre_curso, nombre, carnet_catedratico)
+
+            elif opcion == "4":
+                carnet_estudiante = input("Ingrese el carnet del estudiante: ")
+                nombre_curso = input("Ingrese el nombre del curso: ")
+                sistema.inscribir_estudiante(carnet_estudiante, nombre_curso)
+            
+            elif opcion == "5":
+                nombre_curso = input("Ingrese el nombre del curso: ")
+                tipo = input("Ingrese el tipo de evaluación (Examen/Tarea): ")
+                nombre_evaluacion = input("Ingrese el nombre de la evaluación: ")
+                puntaje = float(input("Ingrese el puntaje máximo de la evaluación: "))
+                if tipo.lower() == "tarea":
+                    sistema.agregar_evaluacion_a_curso(nombre_curso, tipo, nombre_evaluacion, puntaje)
+                elif tipo.lower() == "examen":
+                    sistema.agregar_evaluacion_a_curso(nombre_curso, tipo, nombre_evaluacion, puntaje)
+                
+            elif opcion == "6":
+                nombre_curso = input("Ingrese el nombre del curso: ")
+                nombre_evaluacion = input("Ingrese el nombre de la evaluación: ")
+                carnet_estudiante = input("Ingrese el carnet del estudiante: ")
+                nota = float(input("Ingrese la calificación obtenida: "))
+                sistema.registrar_calificacion(nombre_curso, nombre_evaluacion, carnet_estudiante, nota)
+            
+            elif opcion == "7":
+                nombre_curso = input("Ingrese el nombre del curso: ")
+                sistema.generar_reporte_curso(nombre_curso)
+
+            elif opcion == "8":
+                print("Saliendo del sistema. ¡Hasta luego!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+
+        
+        except Exception as e:
+            print(f"Error: {e}")
+
+if __name__ == "__main__":
+    menu()
