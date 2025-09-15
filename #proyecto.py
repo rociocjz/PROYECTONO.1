@@ -46,4 +46,27 @@ class catedratico(Usuario):
                 self._cursos.add(nombrecurso)
                 print(f"Curso {nombrecurso} asignado exitosamente al catedrático {self.nombre}.")
                 break
+
+class Curso:
+    def __init__(self, nombre, nombre_catedratico):
+        self.nombre = nombre
+        self.nombre_catedratico = nombre_catedratico
+        self._estudiantes = set()
+        self.evaluaciones = {}
+
+    def agregar_estudiante(self, estudiante):
+        if estudiante in self._estudiantes:
+            print(f"El estudiante {estudiante.nombre} ya está inscrito en el curso {self.nombre}.")
+        else:
+            self._estudiantes.add(estudiante)
+            print(f"Estudiante {estudiante.nombre} agregado existosamente al curso {self.nombre}.")
             
+    def agregar_estudiante(self, carnet_estudiante):
+       while True:
+            if carnet_estudiante in self._estudiantes:
+                print(f"El estudiante con carnet {carnet_estudiante} ya está inscrito en el curso {self.nombre}.")
+                carnet_estudiante = input("Ingrese un nuevo carnet de estudiante: ")
+            else:
+                self._estudiantes.add(carnet_estudiante)
+                print(f"Estudiante con carnet {carnet_estudiante} agregado al curso {self.nombre}.")
+                break
