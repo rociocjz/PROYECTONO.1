@@ -148,18 +148,19 @@ class Sistema:
         curso.evaluaciones[nombre_evaluacion].registrar_calificacion(carnet_estudiante, nota)
 
     def generar_reporte_curso(self, nombre_curso):
+        
+        if nombre_curso not in self.cursos:
+            raise Exception(f"No se encontró el curso.")
+        curso = self.cursos[nombre_curso]
         print(f"Reporte del curso: {nombre_curso}")
-        for curso in self.cursos.values():
-            for estudiante in curso._estudiantes:
-                notas = []
-                for evaluacion in curso.evaluaciones.values():
-                    if estudiante in evaluacion.calificaciones:
-                        notas.append(evaluacion.calificaciones[estudiante])
-                if notas:
-                    promedio = sum(notas) / len(notas)
-                    if promedio < 60:
-                        print(f"Estudiante {estudiante} tiene un promedio de {promedio:.2f} - REPROBADO TIENE RENDIMIENTO MUY BAJO")
-
+        for estudiante in curso._estudiantes:
+            notas = []
+            for evaluacion in curso.evaluaciones.values():
+                if estudiante in evaluacion.calificaciones:
+                    notas.append(evaluacion.calificaciones[estudiante])
+            if notas:
+                promedio = sum(notas) / len(notas)
+                estado = "REPORBADO, ESTUDIANTE CON PROMEDIO MUY BAJO" if promedio < 60 else "APROBADO"
 def menu():
     sistema = Sistema()
     while True:
