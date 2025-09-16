@@ -158,7 +158,8 @@ class Sistema:
             raise Exception(f"No se encontró el curso.")
         curso = self.cursos[nombre_curso]
         print(f"Reporte del curso: {nombre_curso}")
-        for estudiante in curso._estudiantes:
+        for carnet in curso._estudiantes:
+            estudiante = self.usuarios[carnet]
             notas = []
             for evaluacion in curso.evaluaciones.values():
                 if carnet in evaluacion.calificaciones:
@@ -166,7 +167,9 @@ class Sistema:
             if notas:
                 promedio = sum(notas) / len(notas)
                 estado = "REPORBADO, ESTUDIANTE CON PROMEDIO MUY BAJO" if promedio < 60 else "APROBADO"
-                print(f"Estudiante {estudiante}: Promedio = {promedio:.2f} - {estado}")
+                print(f"Estudiante: {estudiante.nombre} ({carnet}): Promedio = {promedio:.2f}-{estado}")
+            else:
+                print(f"Estudiante: {estudiante.nombre} ({carnet}): No tiene notas registradas.")
 def menu():
     sistema = Sistema()
     while True:
