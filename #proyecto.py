@@ -35,10 +35,12 @@ class Catedratico(Usuario):
     def asigancion_catedratico(self, nombrecurso ):
        self.cursos.add(nombrecurso)
        print(f"Curso {nombrecurso} asignado exitosamente al catedrático {self.nombre}")
+
+
 class Curso:
-    def __init__(self, nombre, nombre_catedratico):
+    def __init__(self, nombre, catedratico):
         self.nombre = nombre
-        self.nombre_catedratico = nombre_catedratico
+        self.catedratico = catedratico
         self._estudiantes = set()
         self.evaluaciones = {}
 
@@ -75,16 +77,16 @@ class Evaluacion(ABC):
     
     @abstractmethod
     def registrar_calificacion(self, carnet_estudiante, nota):
-        if nota < 0 or nota > self.puntaje:
-            raise ValueError(f"Error meta una nota valida")
-        self.calificaciones[carnet_estudiante] = nota
+        pass
 
 class Examen(Evaluacion):
     def __init__(self, nombre_examen, puntaje):
         super().__init__(nombre_examen, "Examen", puntaje)
 
     def registrar_calificacion(self, carnet_estudiante, nota):
-        super().registrar_calificacion(carnet_estudiante, nota)
+        if nota < 0 or nota > self.puntaje:
+            raise Exception(f"La nota deberia de ser entre 0 y {self.puntaje}.")
+        self.calificaciones[carnet_estudiante] = nota
         print(f"Calificación {nota}, estudiante {carnet_estudiante}, examen {self.nombre_examen}.")
 
 class Tarea(Evaluacion):
@@ -92,9 +94,11 @@ class Tarea(Evaluacion):
         super().__init__(nombre_examen, "Tarea", puntaje)
 
     def registrar_calificacion(self, carnet_estudiante, nota):
-        super().registrar_calificacion(carnet_estudiante, nota)
+        if nota < 0 or nota > self.puntaje:
+            raise Exception(f"La nota debe de ser entre 0 y {self.nombre_examen}.")
+        self.calificaciones[carnet_estudiante] = nota
         print(f"Calificación {nota}, estudiante {carnet_estudiante}, tarea {self.nombre_examen}.")
-
+        
 class Sistema:
     def __init__(self):
         self.usuarios = {}
@@ -111,11 +115,12 @@ class Sistema:
         if carnet_catedratico not in self.usuarios or not isinstance(self.usuarios[carnet_catedratico], Catedratico):
             raise Exception(f"No se encontró un catedrático con carnet {carnet_catedratico}.")
         
-       
-        nuevo_curso = Curso(nombre_curso, carnet_catedratico    )
+        catedratico = self.usuarios[carnet_catedratico]
+        nuevo_curso = Curso(nombre_curso, catedratico    )
         self.cursos[nombre_curso] = nuevo_curso
-        self.usuarios[carnet_catedratico].asigancion_catedratico(nombre_curso)
-        print(f"Curso {nombre_curso} agregado exitosamente con catedrático {self.usuarios[carnet_catedratico].nombre}.")
+        
+        catedratico.asigancion_catedratico(nombre_curso)    
+        print(f"Curso {nombre_curso} agregado exitosamente con catedrático {catedratico.nombre}.")
 
     def inscribir_estudiante(self, carnet_estudiante, nombre_curso):
         if carnet_estudiante not in self.usuarios or not isinstance(self.usuarios[carnet_estudiante], Estudiante):
@@ -156,11 +161,12 @@ class Sistema:
         for estudiante in curso._estudiantes:
             notas = []
             for evaluacion in curso.evaluaciones.values():
-                if estudiante in evaluacion.calificaciones:
-                    notas.append(evaluacion.calificaciones[estudiante])
+                if carnet in evaluacion.calificaciones:
+                    notas.append(evaluacion.calificaciones[carnet])
             if notas:
                 promedio = sum(notas) / len(notas)
                 estado = "REPORBADO, ESTUDIANTE CON PROMEDIO MUY BAJO" if promedio < 60 else "APROBADO"
+                print(f"Estudiante {estudiante}: Promedio = {promedio:.2f} - {estado}")
 def menu():
     sistema = Sistema()
     while True:
@@ -180,22 +186,19 @@ def menu():
             if opcion == "1":
                 carnet = input("Ingrese el carnet del estudiante: ")
                 nombre = input("Ingrese el nombre del estudiante: ")
-                estudiante = Estudiante(carnet, nombre)
-                sistema.agregar_usuario(estudiante)
-                print(f"Estudiante {nombre} agregado exitosamente.")
+                sistema.agregar_usuario(Estudiante(carnet, nombre))
+                print(f"Estudiante agregado exitosamente.")
 
 
             elif opcion == "2":
                 carnet = input("Ingrese el carnet del catedrático: ")
                 nombre = input("Ingrese el nombre del catedrático: ")
-                catedratico = Catedratico(carnet, nombre)
-                sistema.agregar_usuario(catedratico)
+                sistema.agregar_usuario(Catedratico(carnet, nombre))
                 print(f"Catedrático {nombre} agregado exitosamente.")   
 
             elif opcion == "3":
                 nombre_curso = input("Ingrese el nombre del curso: ")
-                
-                carnet_catedratico = input("Ingrese el carnet del catedrático asignado: ")
+                carnet_catedratico = input("Ingrese el carnet del catedrático : ")
                 sistema.agregar_curso(nombre_curso, carnet_catedratico)
 
             elif opcion == "4":
@@ -208,16 +211,13 @@ def menu():
                 tipo = input("Ingrese el tipo de evaluación (Examen/Tarea): ")
                 nombre_evaluacion = input("Ingrese el nombre de la evaluación: ")
                 puntaje = float(input("Ingrese el puntaje máximo de la evaluación: "))
-                if tipo.lower() == "tarea":
-                    sistema.agregar_evaluacion_a_curso(nombre_curso, tipo, nombre_evaluacion, puntaje)
-                elif tipo.lower() == "examen":
-                    sistema.agregar_evaluacion_a_curso(nombre_curso, tipo, nombre_evaluacion, puntaje)
+                sistema.agregar_evaluacion_a_curso(nombre_curso, tipo, nombre_evaluacion, puntaje)
                 
             elif opcion == "6":
                 nombre_curso = input("Ingrese el nombre del curso: ")
                 nombre_evaluacion = input("Ingrese el nombre de la evaluación: ")
                 carnet_estudiante = input("Ingrese el carnet del estudiante: ")
-                nota = float(input("Ingrese la calificación obtenida: "))
+                nota = float(input("Ingrese la calificación: "))
                 sistema.registrar_calificacion(nombre_curso, nombre_evaluacion, carnet_estudiante, nota)
             
             elif opcion == "7":
@@ -225,7 +225,7 @@ def menu():
                 sistema.generar_reporte_curso(nombre_curso)
 
             elif opcion == "8":
-                print("Saliendo del sistema. ¡Hasta luego!")
+                print("Saliendo del sistema... nos vemos pronto! ")
                 break
             else:
                 print("Opción no válida. Intente de nuevo.")
