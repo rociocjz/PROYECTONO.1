@@ -120,7 +120,6 @@ class Sistema:
         self.cursos[nombre_curso] = nuevo_curso
         
         catedratico.asigancion_catedratico(nombre_curso)    
-        print(f"Curso {nombre_curso} agregado exitosamente con catedrático {catedratico.nombre}.")
 
     def inscribir_estudiante(self, carnet_estudiante, nombre_curso):
         if carnet_estudiante not in self.usuarios or not isinstance(self.usuarios[carnet_estudiante], Estudiante):
