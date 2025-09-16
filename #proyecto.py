@@ -4,11 +4,11 @@ class Usuario(ABC):
     def __init__(self, carnet, nombre):
         self._carnet = carnet
         self._nombre = nombre
-       
 
     @property
     def carnet(self):
         return self._carnet
+    
     @property
     def nombre(self):
         return self._nombre
@@ -48,10 +48,10 @@ class Curso:
            raise Exception(f"El estudiante con carnet {carnet_estudiante} ya está inscrito en el curso {self.nombre}.")
        self._estudiantes.add(carnet_estudiante)
        
-    def agregar_evaluacion(self, curso_evaluacion):
-         if curso_evaluacion in self.evaluaciones:
-              raise Exception(f"La evaluación {curso_evaluacion} ya existe en el curso {self.nombre}.")
-         self.evaluaciones[curso_evaluacion] = None
+    def agregar_evaluacion(self, evaluacion):
+         if evaluacion.nombre_examen in self.evaluaciones:
+              raise Exception(f"La evaluación {evaluacion.nombre_examen} ya existe en el curso {self.nombre}.")
+         self.evaluaciones[evaluacion.nombre_examen] = evaluacion
        
 class Evaluacion(ABC):
     def __init__(self, nombre_examen,tipo, puntaje):
@@ -76,7 +76,7 @@ class Evaluacion(ABC):
     @abstractmethod
     def registrar_calificacion(self, carnet_estudiante, nota):
         if nota < 0 or nota > self.puntaje:
-            raise ValueError(f"La calificación debe estar entre 0 y 100.")
+            raise ValueError(f"Error meta una nota valida")
         self.calificaciones[carnet_estudiante] = nota
 
 class Examen(Evaluacion):
@@ -137,7 +137,7 @@ class Sistema:
             evaluacion = Tarea(*args, **kwargs)
         else:
             raise Exception("Tipo de evaluación no válido. Use 'Examen' o 'Tarea'.")
-        self.cursos[nombre_curso].evaluaciones[evaluacion.nombre_examen] = evaluacion
+        self.cursos[nombre_curso].agregar_evaluacion(evaluacion)
         
     def registrar_calificacion(self, nombre_curso, nombre_evaluacion, carnet_estudiante, nota):
         if nombre_curso not in self.cursos:
@@ -193,9 +193,9 @@ def menu():
 
             elif opcion == "3":
                 nombre_curso = input("Ingrese el nombre del curso: ")
-                nombre = input("Ingrese el nombre del catedrático asignado: ")
+                
                 carnet_catedratico = input("Ingrese el carnet del catedrático asignado: ")
-                sistema.agregar_curso(nombre_curso, nombre, carnet_catedratico)
+                sistema.agregar_curso(nombre_curso, carnet_catedratico)
 
             elif opcion == "4":
                 carnet_estudiante = input("Ingrese el carnet del estudiante: ")
